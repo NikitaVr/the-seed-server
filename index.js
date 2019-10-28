@@ -15,29 +15,36 @@ var port = process.env.PORT || 3000;
 //     ]
 // ]
 
-const rowSize = 8;
+mapSize = 100;
+
+const rowSize = 9;
+
+// var world = {
+//     tiles: [
+//         1, 2, 2, 2, 1, 1, 2, 1,
+//         1, 1, 1, 1, 1, 1, 1, 1,
+//         1, 1, 1, 1, 1, 2, 1, 1,
+//         1, 1, 1, 1, 1, 1, 1, 1,
+//         1, 1, 1, 2, 1, 1, 1, 1,
+//         1, 1, 1, 1, 2, 1, 1, 1,
+//         1, 1, 1, 1, 2, 1, 1, 1,
+//         1, 1, 1, 1, 2, 1, 1, 1
+//     ], // can access specific element by (y * rowSize + x) ?????
+//     dynamic: [
+//         0, 7, 0, 0, 0, 0, 0, 0,
+//         0, 0, 3, 0, 0, 3, 0, 0,
+//         0, 0, 0, 0, 0, 0, 7, 0,
+//         0, 0, 0, 0, 0, 0, 0, 0,
+//         0, 0, 0, 0, 0, 0, 0, 0,
+//         3, 0, 0, 0, 0, 0, 3, 0,
+//         0, 7, 0, 0, 0, 0, 7, 0,
+//         0, 0, 0, 0, 3, 0, 0, 0
+//     ]
+// }
 
 var world = {
-    tiles: [
-        1, 2, 2, 2, 1, 1, 2, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 2, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 2, 1, 1, 1, 1,
-        1, 1, 1, 1, 2, 1, 1, 1,
-        1, 1, 1, 1, 2, 1, 1, 1,
-        1, 1, 1, 1, 2, 1, 1, 1
-    ], // can access specific element by (y * rowSize + x) ?????
-    dynamic: [
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 3, 0, 0, 3, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        3, 0, 0, 0, 0, 0, 3, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 3, 0, 0, 0
-    ]
+    tiles: Array(mapSize * mapSize).map((val) => Math.floor(Math.random() * 2) + 1),
+    dynamic: Array(mapSize * mapSize).fill(0)
 }
 
 var players = {}
@@ -74,7 +81,7 @@ function processActions() {
 
 //setInterval(modifyWorld, 1500);
 
-setInterval(processActions, 1500);
+setInterval(processActions, 1000);
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
