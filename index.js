@@ -44,7 +44,7 @@ const rowSize = 9;
 
 var world = {
     tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
-    dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill(0))
+    dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill({}))
 }
 
 var players = {}
@@ -109,9 +109,9 @@ function processActions() {
                     case "right":
                         console.log("MOVE RIGHT")
                         //if (players[key].player.coords.x < rowSize - 1) {
-                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y] = 0
+                        delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
                         players[key].player.coords.x += 1
-                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y] = 6
+                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
                         //}
                         break;
                     default:
@@ -120,12 +120,6 @@ function processActions() {
                 break;
             default:
                 break;
-        }
-
-        if (actions[key].type === "move") {
-            if (actions[key].direction === "right") {
-
-            }
         }
     }
     actions = {}
@@ -152,6 +146,7 @@ io.on('connection', function (socket) {
             y: 20
         }
     }
+    world.dynamic[20][20].player = socket.player;
     players[id] = socket
     socket.on('action', function (msg) {
         actions[socket.player.id] = msg
