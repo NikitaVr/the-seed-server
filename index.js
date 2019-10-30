@@ -43,8 +43,8 @@ const rowSize = 9;
 // }
 
 var world = {
-    tiles: Array(mapSize * mapSize).map((val) => Math.floor(Math.random() * 2) + 1),
-    dynamic: Array(mapSize * mapSize).fill(0)
+    tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
+    dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill(0))
 }
 
 var players = {}
@@ -57,26 +57,82 @@ function modifyWorld() {
     io.emit('get proximity', world);
 }
 
+function withinVisionSlice(array, x, y) {
+    const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
+    return withinVision;
+}
+
+function getPlayerVision(key) {
+    const { player } = players[key]
+    return {
+        tiles: withinVisionSlice(world.tiles, player.coords.x, player.coords.y),
+        dynamic: withinVisionSlice(world.dynamic, player.coords.x, player.coords.y)
+    }
+
+}
+
+
+
+// function movePlayerLeft(key) {
+//     if (players[key].player.coords.x < rowSize - 1) {
+//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 0
+//         players[key].player.coords.x += 1
+//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 6
+//     }
+// }
+
+// function movePlayerRight(key) {
+//     if (players[key].player.coords.x < rowSize - 1) {
+//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 0
+//         players[key].player.coords.x += 1
+//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 6
+//     }
+// }
+
+// function movePlayerUp(key) {
+
+// }
+
+// function movePlayerDown(key) {
+
+// }
+
+
+
 function processActions() {
     console.log('Processing Actions');
-    console.log("PLAYERS -----------------------------------------------------------")
-    console.log(players)
-    console.log("ACTIONS -----------------------------------------------------------")
     console.log(actions)
     for (var key in actions) {
+        switch (actions[key].type) {
+            case "move":
+                switch (actions[key].direction) {
+                    case "right":
+                        console.log("MOVE RIGHT")
+                        //if (players[key].player.coords.x < rowSize - 1) {
+                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y] = 0
+                        players[key].player.coords.x += 1
+                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y] = 6
+                        //}
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+
         if (actions[key].type === "move") {
             if (actions[key].direction === "right") {
-                if (players[key].player.coords.x < rowSize - 1) {
-                    console.log("MOVING +++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                    world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 0
-                    players[key].player.coords.x += 1
-                    world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 6
-                }
+
             }
         }
     }
     actions = {}
-    io.emit('get proximity', world);
+    //io.emit('get proximity', world);
+    for (var key in players) {
+        players[key].emit('get proximity', getPlayerVision(key))
+    }
 }
 
 //setInterval(modifyWorld, 1500);
@@ -92,8 +148,8 @@ io.on('connection', function (socket) {
     socket.player = {
         id: id,
         coords: {
-            x: 2,
-            y: 2
+            x: 20,
+            y: 20
         }
     }
     players[id] = socket
