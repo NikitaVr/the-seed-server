@@ -155,6 +155,7 @@ function processActions() {
             case "use ground item":
                 if (world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries) {
                     delete world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries
+                    getPlayer(key).food += 5; // add a cap at max food ...
                 }
                 break;
             default:
