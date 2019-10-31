@@ -121,6 +121,16 @@ function getPlayerCoords(key) {
 // }
 
 
+// make an item class ? 
+/*
+
+{
+    name: "berries",
+    effect: function(playerKey???)...
+}
+
+*/
+
 
 function processActions() {
     console.log('Processing Actions');
@@ -140,6 +150,11 @@ function processActions() {
                         break;
                     default:
                         break;
+                }
+                break;
+            case "use ground item":
+                if (world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries) {
+                    delete world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries
                 }
                 break;
             default:
