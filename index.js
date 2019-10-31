@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-const uuidv1 = require('uuid/v1'); // timestamp based uuid
+const uuidv1 = require('uuid/v4');
 var port = process.env.PORT || 3000;
 
 // var world = [
@@ -42,10 +42,27 @@ const rowSize = 9;
 //     ]
 // }
 
+
+
+
 var world = {
     tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
     dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill({}))
 }
+
+// make a generic spawn random function for any items, NPCs, obstacles, etc ?
+function spawnBerries() {
+    world.dynamic = world.dynamic.map((innerArray) => innerArray.map(val => {
+        if (Math.random() > 0.9) {
+            return { ...val, berries: 1 }
+        } else {
+            return val
+        }
+
+    }))
+}
+
+spawnBerries()
 
 var players = {}
 
@@ -63,34 +80,40 @@ function withinVisionSlice(array, x, y) {
 }
 
 function getPlayerVision(key) {
-    const { player } = players[key]
-    return {
+    const player = getPlayer(key)
+    const response = {
         tiles: withinVisionSlice(world.tiles, player.coords.x, player.coords.y),
         dynamic: withinVisionSlice(world.dynamic, player.coords.x, player.coords.y)
     }
+    return response
+}
 
+function getPlayer(key) {
+    return players[key].player
+}
+
+function getPlayerCoords(key) {
+    return getPlayer(key).coords
 }
 
 
 
 // function movePlayerLeft(key) {
-//     if (players[key].player.coords.x < rowSize - 1) {
-//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 0
-//         players[key].player.coords.x += 1
-//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 6
-//     }
+//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
+//     players[key].player.coords.x -= 1
+//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
 // }
 
 // function movePlayerRight(key) {
-//     if (players[key].player.coords.x < rowSize - 1) {
-//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 0
-//         players[key].player.coords.x += 1
-//         world.dynamic[players[key].player.coords.y * rowSize + players[key].player.coords.x] = 6
-//     }
+//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
+//     players[key].player.coords.x += 1
+//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
 // }
 
 // function movePlayerUp(key) {
-
+//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
+//     players[key].player.coords.x += 1
+//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
 // }
 
 // function movePlayerDown(key) {
@@ -103,15 +126,16 @@ function processActions() {
     console.log('Processing Actions');
     console.log(actions)
     for (var key in actions) {
+        getPlayer(key).food -= 1;
         switch (actions[key].type) {
             case "move":
                 switch (actions[key].direction) {
                     case "right":
                         console.log("MOVE RIGHT")
                         //if (players[key].player.coords.x < rowSize - 1) {
-                        delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
-                        players[key].player.coords.x += 1
-                        world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
+                        delete world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].player
+                        players[key].player.coords.x += 1;
+                        world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y] = { ...world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y], player: getPlayer(key) }
                         //}
                         break;
                     default:
@@ -125,7 +149,15 @@ function processActions() {
     actions = {}
     //io.emit('get proximity', world);
     for (var key in players) {
-        players[key].emit('get proximity', getPlayerVision(key))
+        if (getPlayer(key).food <= 0) {
+            players[key].emit('dead of hunger')
+            players[key].conn.close()
+            delete players[key] // make this whole death thing into separate function? with different reasons for death?
+            console.log("DEAD")
+        } else {
+            players[key].emit('get proximity', getPlayerVision(key))
+        }
+
     }
 }
 
@@ -144,13 +176,15 @@ io.on('connection', function (socket) {
         coords: {
             x: 20,
             y: 20
-        }
+        },
+        food: 10
     }
-    world.dynamic[20][20].player = socket.player;
     players[id] = socket
+    world.dynamic[20][20] = { player: socket.player };
     socket.on('action', function (msg) {
         actions[socket.player.id] = msg
     });
+    players[id].emit('get proximity', getPlayerVision(id))
 });
 
 // io.on('connection', function (socket) {
