@@ -4,46 +4,9 @@ var io = require('socket.io')(http);
 const uuidv1 = require('uuid/v4');
 var port = process.env.PORT || 3000;
 
-// var world = [
-//     [
-//         { tile: 0 },
-//         { tile: 0 }
-//     ],
-//     [
-//         { tile: 0 },
-//         { tile: 1 }
-//     ]
-// ]
-
 mapSize = 100;
 
 const rowSize = 9;
-
-// var world = {
-//     tiles: [
-//         1, 2, 2, 2, 1, 1, 2, 1,
-//         1, 1, 1, 1, 1, 1, 1, 1,
-//         1, 1, 1, 1, 1, 2, 1, 1,
-//         1, 1, 1, 1, 1, 1, 1, 1,
-//         1, 1, 1, 2, 1, 1, 1, 1,
-//         1, 1, 1, 1, 2, 1, 1, 1,
-//         1, 1, 1, 1, 2, 1, 1, 1,
-//         1, 1, 1, 1, 2, 1, 1, 1
-//     ], // can access specific element by (y * rowSize + x) ?????
-//     dynamic: [
-//         0, 7, 0, 0, 0, 0, 0, 0,
-//         0, 0, 3, 0, 0, 3, 0, 0,
-//         0, 0, 0, 0, 0, 0, 7, 0,
-//         0, 0, 0, 0, 0, 0, 0, 0,
-//         0, 0, 0, 0, 0, 0, 0, 0,
-//         3, 0, 0, 0, 0, 0, 3, 0,
-//         0, 7, 0, 0, 0, 0, 7, 0,
-//         0, 0, 0, 0, 3, 0, 0, 0
-//     ]
-// }
-
-
-
 
 var world = {
     tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
@@ -68,12 +31,6 @@ var players = {}
 
 var actions = {}
 
-function modifyWorld() {
-    console.log('Cant stop me now!');
-    //world[Math.floor(Math.random() * world.length)] = Math.floor(Math.random() * 3) + 1; // sets random tile to random integer from 1 to 3 inclusive
-    io.emit('get proximity', world);
-}
-
 function withinVisionSlice(array, x, y) {
     const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
     return withinVision;
@@ -95,30 +52,6 @@ function getPlayer(key) {
 function getPlayerCoords(key) {
     return getPlayer(key).coords
 }
-
-
-
-// function movePlayerLeft(key) {
-//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
-//     players[key].player.coords.x -= 1
-//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
-// }
-
-// function movePlayerRight(key) {
-//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
-//     players[key].player.coords.x += 1
-//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
-// }
-
-// function movePlayerUp(key) {
-//     delete world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player
-//     players[key].player.coords.x += 1
-//     world.dynamic[players[key].player.coords.x][players[key].player.coords.y].player = players[key].player
-// }
-
-// function movePlayerDown(key) {
-
-// }
 
 
 // make an item class ? 
@@ -177,9 +110,7 @@ function processActions() {
     }
 }
 
-//setInterval(modifyWorld, 1500);
-
-setInterval(processActions, 1000);
+setInterval(processActions, 1000); // process actions every 1 second
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
@@ -202,17 +133,6 @@ io.on('connection', function (socket) {
     });
     players[id].emit('get proximity', getPlayerVision(id))
 });
-
-// io.on('connection', function (socket) {
-//     socket.on('chat message', function (msg) {
-//         io.emit('chat message', msg);
-//     });
-//     socket.on('A', function (something) {
-//         // we just received a message
-//         // let's respond to *that* client :
-//         socket.emit('B', somethingElse);
-//     });
-// });
 
 http.listen(port, function () {
     console.log('listening on *:' + port);
