@@ -2,13 +2,13 @@
     "name": "the-seed-server",
     "version": "0.0.1",
     "description": "my first socket.io app",
+    "scripts": {
+        "start": "node ./dist/index.js"
+    },
     "dependencies": {
         "express": "^4.15.2",
         "socket.io": "^1.7.3",
         "uuid": "^3.3.3"
-    },
-    "scripts": {
-        "start": "node index.js"
     },
     "devDependencies": {
         "@types/express": "^4.17.2",
