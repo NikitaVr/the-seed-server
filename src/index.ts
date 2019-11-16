@@ -10,9 +10,14 @@ const mapSize = 100;
 
 const rowSize = 9;
 
+class tyleState{
+    player?: any
+    berries?:any
+}
+
 const world = {
-    tiles: [...Array(mapSize)].map(() => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
-    dynamic: [...Array(mapSize)].map(() => [...Array(mapSize)].fill({}))
+    tiles: Array(rowSize).fill(null).map(() => Array(rowSize).fill(0).map(() => Math.floor(Math.random() * 2) + 1)),
+    dynamic: Array(mapSize).fill(null).map(() => Array(mapSize).fill(null).map(() => { return new tyleState()}))
 }
 
 // make a generic spawn random function for any items, NPCs, obstacles, etc ?
