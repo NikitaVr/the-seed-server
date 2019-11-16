@@ -1,10 +1,9 @@
-import express from 'express'
-const app = express();
-import { Server} from 'http'
-const http = new Server(app);
-import socket_io from 'socket.io'
-const io = socket_io(http);
-import uuidv1 from 'uuid/v4';
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
+import uuidv1 from 'uuid/v4'; 
+
 const port = process.env.PORT || 3000;
 
 const mapSize = 100;
@@ -12,8 +11,8 @@ const mapSize = 100;
 const rowSize = 9;
 
 const world = {
-    tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
-    dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill({}))
+    tiles: [...Array(mapSize)].map(() => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
+    dynamic: [...Array(mapSize)].map(() => [...Array(mapSize)].fill({}))
 }
 
 // make a generic spawn random function for any items, NPCs, obstacles, etc ?
