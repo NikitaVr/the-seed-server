@@ -1,14 +1,14 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const app = require('express')();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 const uuidv1 = require('uuid/v4');
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 const mapSize = 100;
 
 const rowSize = 9;
 
-var world = {
+const world = {
     tiles: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].map((val) => Math.floor(Math.random() * 2) + 1)),
     dynamic: [...Array(mapSize)].map((innerArray) => [...Array(mapSize)].fill({}))
 }
@@ -27,9 +27,9 @@ function spawnBerries() {
 
 spawnBerries()
 
-var players = {}
+const players = {}
 
-var actions = {}
+let actions = {}
 
 function withinVisionSlice(array, x, y) {
     const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
