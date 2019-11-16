@@ -1,7 +1,10 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const uuidv1 = require('uuid/v4');
+import express from 'express'
+const app = express();
+import { Server} from 'http'
+const http = new Server(app);
+import socket_io from 'socket.io'
+const io = socket_io(http);
+import uuidv1 from 'uuid/v4';
 const port = process.env.PORT || 3000;
 
 const mapSize = 100;

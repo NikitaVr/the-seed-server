@@ -11,6 +11,9 @@
         "start": "node index.js"
     },
     "devDependencies": {
-        "@types/node": "^12.12.8"
+        "@types/express": "^4.17.2",
+        "@types/node": "^12.12.8",
+        "@types/socket.io": "^2.1.4",
+        "@types/uuid": "^3.4.6"
     }
 }
