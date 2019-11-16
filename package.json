@@ -9,5 +9,8 @@
     },
     "scripts": {
         "start": "node index.js"
+    },
+    "devDependencies": {
+        "@types/node": "^12.12.8"
     }
 }

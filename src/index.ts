@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 const uuidv1 = require('uuid/v4');
 var port = process.env.PORT || 3000;
 
-mapSize = 100;
+const mapSize = 100;
 
 const rowSize = 9;
 
