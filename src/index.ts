@@ -36,7 +36,7 @@ spawnBerries()
 
 const players = {}
 
-var actions = {}
+let actions = {}
 
 function withinVisionSlice(array, x, y) {
     const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
