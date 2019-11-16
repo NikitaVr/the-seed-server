@@ -16,7 +16,7 @@ class tyleState{
 }
 
 const world = {
-    tiles: Array(rowSize).fill(null).map(() => Array(rowSize).fill(0).map(() => Math.floor(Math.random() * 2) + 1)),
+    tiles: Array(mapSize).fill(null).map(() => Array(mapSize).fill(0).map(() => Math.floor(Math.random() * 2) + 1)),
     dynamic: Array(mapSize).fill(null).map(() => Array(mapSize).fill(null).map(() => { return new tyleState()}))
 }
 
@@ -36,7 +36,7 @@ spawnBerries()
 
 const players = {}
 
-let actions = {}
+var actions = {}
 
 function withinVisionSlice(array, x, y) {
     const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
@@ -137,6 +137,7 @@ io.on('connection', function (socket) {
     world.dynamic[20][20] = { player: socket.player };
     socket.on('action', function (msg) {
         actions[socket.player.id] = msg
+        console.log(actions)
     });
     players[id].emit('get proximity', getPlayerVision(id))
 });
