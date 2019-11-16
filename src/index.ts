@@ -16,8 +16,8 @@ class tyleState{
 }
 
 const world = {
-    tiles: Array(mapSize).fill(null).map(() => Array(mapSize).fill(0).map(() => Math.floor(Math.random() * 2) + 1)),
-    dynamic: Array(mapSize).fill(null).map(() => Array(mapSize).fill(null).map(() => { return new tyleState()}))
+    tiles: [...Array(mapSize)].map(() => [...Array(mapSize)].map(() => Math.floor(Math.random() * 2) + 1)),
+    dynamic: [...Array(mapSize)].map(() => [...Array(mapSize)].map(() => { return new tyleState()}))
 }
 
 // make a generic spawn random function for any items, NPCs, obstacles, etc ?
