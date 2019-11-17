@@ -36,30 +36,37 @@ function spawnBerries() {
 
 spawnBerries()
 
-const players = {}
+export interface Hash<T = any> {
+    [key: string]: T
+}
+
+interface Players extends Hash<Player>{}
+const players: Players = {}
 
 let actions = {}
 
-function withinVisionSlice(array, x, y) {
-    const withinVision = array.slice(x - 4, x + 5).map(function (column) { return column.slice(y - 4, y + 5); });
-    return withinVision;
+function getVisibleArea(array: any[][], x: number, y: number) {
+    const visible = array.slice(x - 4, x + 5).map(column => {
+        return column.slice(y - 4, y + 5);
+    });
+    return visible;
 }
 
-function getPlayerVision(key) {
+function getPlayerVision(key: string) {
     const player = getPlayer(key)
     const response = {
-        tiles: withinVisionSlice(world.tiles, player.coords.x, player.coords.y),
-        dynamic: withinVisionSlice(world.dynamic, player.coords.x, player.coords.y)
+        tiles: getVisibleArea(world.tiles, player.state.coords.x, player.state.coords.y),
+        dynamic: getVisibleArea(world.dynamic, player.state.coords.x, player.state.coords.y)
     }
     return response
 }
 
-function getPlayer(key) {
-    return players[key].player
+function getPlayer(key: string) {
+    return players[key]
 }
 
-function getPlayerCoords(key) {
-    return getPlayer(key).coords
+function getPlayerCoords(key: string) {
+    return getPlayer(key).state.coords
 }
 
 
@@ -78,7 +85,7 @@ function processActions() {
     console.log('Processing Actions');
     console.log(actions)
     for (var key in actions) {
-        getPlayer(key).food -= 1;
+        getPlayer(key).state.food -= 1;
         switch (actions[key].type) {
             case "move":
                 switch (actions[key].direction) {
@@ -86,8 +93,8 @@ function processActions() {
                         console.log("MOVE RIGHT")
                         //if (players[key].player.coords.x < rowSize - 1) {
                         delete world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].player
-                        players[key].player.coords.x += 1;
-                        world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y] = { ...world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y], player: getPlayer(key) }
+                        players[key].state.coords.x += 1;
+                        world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y] = { ...world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y], player: getPlayer(key).state }
                         //}
                         break;
                     default:
@@ -97,7 +104,7 @@ function processActions() {
             case "use ground item":
                 if (world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries) {
                     delete world.dynamic[getPlayerCoords(key).x][getPlayerCoords(key).y].berries
-                    getPlayer(key).food += 5; // add a cap at max food ...
+                    getPlayer(key).state.food += 5; // add a cap at max food ...
                 }
                 break;
             default:
@@ -107,13 +114,13 @@ function processActions() {
     actions = {}
     //io.emit('get proximity', world);
     for (var key in players) {
-        if (getPlayer(key).food <= 0) {
-            players[key].emit('dead of hunger')
-            players[key].conn.close()
+        if (getPlayer(key).state.food <= 0) {
+            players[key].socket.emit('dead of hunger')
+            players[key].socket.disconnect(true)
             delete players[key] // make this whole death thing into separate function? with different reasons for death?
             console.log("DEAD")
         } else {
-            players[key].emit('get proximity', getPlayerVision(key))
+            players[key].socket.emit('get proximity', getPlayerVision(key))
         }
 
     }
@@ -130,29 +137,22 @@ interface Coordinates{
     y: number
 }
 class PlayerState{
-    constructor(public id: string, public coords: Coordinates, public food: number){}
+    constructor(public coords: Coordinates, public food: number) {}
 }
 class Player {
+    id = uuidv1();
     constructor(public socket: socketIO.Socket, public state: PlayerState) { }
 }
 
 ioServer.on('connection', function (socket: any) {
-    const id = uuidv1();
-    socket.player = {
-        id: id,
-        coords: {
-            x: 20,
-            y: 20
-        },
-        food: 10
-    }
-    players[id] = socket
-    world.dynamic[20][20] = { player: socket.player };
-    socket.on('action', function (msg) {
-        actions[socket.player.id] = msg
+    const player = new Player(socket, new PlayerState({x:20, y:20}, 10))
+    players[player.id] = player
+    world.dynamic[20][20] = { player: player.state };
+    socket.on('action', function (action) {
+        actions[player.id] = action
         console.log(actions)
     });
-    players[id].emit('get proximity', getPlayerVision(id))
+    player.socket.emit('get proximity', getPlayerVision(player.id))
 });
 
 http.listen(port, function () {
