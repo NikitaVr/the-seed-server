@@ -1,7 +1,9 @@
-const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-
+import express from 'express'
+const app = express();
+import {Server} from 'http'
+const http = new Server(app);
+import socketIO from 'socket.io'
+const ioServer = socketIO(http);
 import uuidv1 from 'uuid/v4'; 
 
 const port = process.env.PORT || 3000;
@@ -123,7 +125,18 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', function (socket) {
+interface Coordinates{
+    x: number
+    y: number
+}
+class PlayerState{
+    constructor(public id: string, public coords: Coordinates, public food: number){}
+}
+class Player {
+    constructor(public socket: socketIO.Socket, public state: PlayerState) { }
+}
+
+ioServer.on('connection', function (socket: any) {
     const id = uuidv1();
     socket.player = {
         id: id,
