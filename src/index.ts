@@ -77,8 +77,8 @@ function processActions() {
         if (getPlayer(key).state.food <= 0) {
             players[key].socket.emit('dead of hunger')
             players[key].socket.disconnect(true)
-            delete players[key] // make this whole death thing into separate function? with different reasons for death?
             map.delete(players[key])
+            delete players[key] // make this whole death thing into separate function? with different reasons for death?
             console.log("DEAD")
         } else {
             players[key].socket.emit('get proximity', getPlayerVision(key))
