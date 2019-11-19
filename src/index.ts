@@ -78,6 +78,7 @@ function processActions() {
             players[key].socket.emit('dead of hunger')
             players[key].socket.disconnect(true)
             delete players[key] // make this whole death thing into separate function? with different reasons for death?
+            map.delete(players[key])
             console.log("DEAD")
         } else {
             players[key].socket.emit('get proximity', getPlayerVision(key))
