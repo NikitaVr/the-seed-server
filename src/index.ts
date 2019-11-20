@@ -89,7 +89,16 @@ function processActions() {
     }
 }
 
-setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
+if (process.env.WAIT_FOR_PLAYERS == 'false') {
+    setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
+}
+
+function compareKeys(a, b) {
+    var aKeys = Object.keys(a).sort();
+    var bKeys = Object.keys(b).sort();
+    return JSON.stringify(aKeys) === JSON.stringify(bKeys);
+}
+
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
@@ -97,12 +106,20 @@ app.get('/', function (req, res) {
 
 
 ioServer.on('connection', function (socket: any) {
-    const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 10))
+    const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 30))
     players[player.id] = player
     map.place(player)
     socket.on('action', function (action) {
         actions[player.id] = action
         console.log(actions)
+
+        if (process.env.WAIT_FOR_PLAYERS == 'true') {
+            // compare if all players have submitted actions
+            if (compareKeys(players, actions)) {
+                processActions()
+            }
+        }
+
     });
     player.socket.emit('get proximity', getPlayerVision(player.id))
 });
