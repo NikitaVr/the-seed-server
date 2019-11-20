@@ -2,7 +2,9 @@
 
 Run `yarn`
 
-Run `node index.js`
+Run `tsc`
+
+Run `node dist\index.js`
 
 Should start to see server running, and processing empty actions
 
