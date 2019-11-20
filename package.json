@@ -6,6 +6,7 @@
         "start": "node ./dist/index.js"
     },
     "dependencies": {
+        "dotenv": "^8.2.0",
         "express": "^4.15.2",
         "socket.io": "^1.7.3",
         "uuid": "^3.3.3"

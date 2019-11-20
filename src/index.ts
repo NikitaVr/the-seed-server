@@ -1,12 +1,14 @@
 import { World } from './model/world';
 import express from 'express'
 const app = express();
-import {Server} from 'http'
+import { Server } from 'http'
 const http = new Server(app);
 import socketIO from 'socket.io'
 const ioServer = socketIO(http);
 import { Player, Players, PlayerState } from './model/player';
 import { Direction } from './lib/types';
+
+require('dotenv').config()
 
 const port = process.env.PORT || 3000;
 
@@ -87,7 +89,7 @@ function processActions() {
     }
 }
 
-setInterval(processActions, 1000); // process actions every 1 second
+setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
@@ -95,7 +97,7 @@ app.get('/', function (req, res) {
 
 
 ioServer.on('connection', function (socket: any) {
-    const player = new Player(socket, new PlayerState({x:20, y:20}, 10))
+    const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 10))
     players[player.id] = player
     map.place(player)
     socket.on('action', function (action) {
