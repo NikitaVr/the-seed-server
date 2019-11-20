@@ -7,6 +7,7 @@ import socketIO from 'socket.io'
 const ioServer = socketIO(http);
 import { Player, Players, PlayerState } from './model/player';
 import { Direction } from './lib/types';
+import { compareKeys } from './lib/utils';
 
 require('dotenv').config()
 
@@ -89,12 +90,13 @@ function processActions() {
     }
 }
 
-setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
+if (process.env.WAIT_FOR_PLAYERS == 'false') {
+    setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
+}
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
-
 
 ioServer.on('connection', function (socket: any) {
     const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 10))
@@ -103,6 +105,14 @@ ioServer.on('connection', function (socket: any) {
     socket.on('action', function (action) {
         actions[player.id] = action
         console.log(actions)
+
+        if (process.env.WAIT_FOR_PLAYERS == 'true') {
+            // compare if all players have submitted actions
+            if (compareKeys(players, actions)) {
+                processActions()
+            }
+        }
+
     });
     player.socket.emit('get proximity', getPlayerVision(player.id))
 });
