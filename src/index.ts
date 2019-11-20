@@ -7,6 +7,7 @@ import socketIO from 'socket.io'
 const ioServer = socketIO(http);
 import { Player, Players, PlayerState } from './model/player';
 import { Direction } from './lib/types';
+import { compareKeys } from './lib/utils';
 
 require('dotenv').config()
 
@@ -93,20 +94,12 @@ if (process.env.WAIT_FOR_PLAYERS == 'false') {
     setInterval(processActions, parseInt(process.env.STEP_TIME) || 1000); // process actions every STEP_TIME, default to 1 second
 }
 
-function compareKeys(a, b) {
-    var aKeys = Object.keys(a).sort();
-    var bKeys = Object.keys(b).sort();
-    return JSON.stringify(aKeys) === JSON.stringify(bKeys);
-}
-
-
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-
 ioServer.on('connection', function (socket: any) {
-    const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 30))
+    const player = new Player(socket, new PlayerState({ x: 20, y: 20 }, 10))
     players[player.id] = player
     map.place(player)
     socket.on('action', function (action) {
