@@ -20,7 +20,7 @@ const rowSize = 9;
 
 const map = new World(mapSize)
 
-const players: Players = {}
+var players: Players = {}
 
 let actions = {}
 
@@ -51,8 +51,8 @@ function getPlayerCoords(key: string) {
 
 
 function processActions() {
-    console.log('Processing Actions');
-    console.log(actions)
+    //console.log('Processing Actions');
+    //console.log(actions)
     for (var key in actions) {
         const player = getPlayer(key)
         player.state.food -= 1;
@@ -79,7 +79,7 @@ function processActions() {
     for (var key in players) {
         if (getPlayer(key).state.food <= 0) {
             players[key].socket.emit('dead of hunger')
-            players[key].socket.disconnect(true)
+            //players[key].socket.disconnect(true)
             map.delete(players[key])
             delete players[key] // make this whole death thing into separate function? with different reasons for death?
             console.log("DEAD")
@@ -104,7 +104,7 @@ ioServer.on('connection', function (socket: any) {
     map.place(player)
     socket.on('action', function (action) {
         actions[player.id] = action
-        console.log(actions)
+        //console.log(actions)
 
         if (process.env.WAIT_FOR_PLAYERS == 'true') {
             // compare if all players have submitted actions
@@ -113,6 +113,16 @@ ioServer.on('connection', function (socket: any) {
             }
         }
 
+    });
+    socket.on('reset', function (action) {
+        console.log('reset start')
+        for (var key in players) {
+            players[key].socket.disconnect(true);
+        }
+        players = {}
+        actions = {}
+        map.reset()
+        console.log("Reset Complete")
     });
     player.socket.emit('get proximity', getPlayerVision(player.id))
 });
