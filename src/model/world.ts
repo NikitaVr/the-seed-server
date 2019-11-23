@@ -2,45 +2,6 @@ import { TileState, Coords, Direction } from "../lib/types"
 import { Player } from "./player"
 import { cloneDeep } from 'lodash';
 
-/**
- * Deep copy function for TypeScript.
- * @param T Generic type of target/copied value.
- * @param target Target value to be copied.
- * @see Source project, ts-deepcopy https://github.com/ykdr2017/ts-deepcopy
- * @see Code pen https://codepen.io/erikvullings/pen/ejyBYg
- */
-// export const deepCopy = <T>(target: T): T => {
-//     if (target === null) {
-//         return target;
-//     }
-//     else if (target instanceof Date) {
-//         return new Date(target.getTime()) as any;
-//     }
-//     else if (target instanceof Array) {
-//         const cp = [] as any[];
-//         (target as any[]).forEach((v) => { cp.push(v); });
-//         return cp.map((n: any) => deepCopy<any>(n)) as any;
-//     }
-//     //if (typeof target === 'object' && target !== {}) {
-//     else {
-//         const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
-//         Object.keys(cp).forEach(k => {
-//             cp[k] = deepCopy<any>(cp[k]);
-//         });
-//         return cp as T;
-//     }
-//     return target;
-// };
-
-// function deepCopy<T>(o: T): T {
-//     return JSON.parse(JSON.stringify(o));
-// }
-
-// export function deepClone<T>(obj: T): T {
-//     const str = JSON.stringify(obj)
-//     return JSON.parse(str) as T;
-// }
-
 export type Tiles<T = any> = T[][]
 // make a generic spawn random function for any items, NPCs, obstacles, etc ?
 export class World {
