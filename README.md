@@ -26,7 +26,7 @@ Can test out connecting a player and rendering by running code in the sample ren
     1. Send new Action to Server
 1. Server
     1. Receives Actions
-    1. Identify Conflicts
+    1. Identify Conflicts ( ex. 2 agents trying to eat the same food )
     1. Resolve Conflicts
     1. Take Actions -> New State
     1. Apply Environment Built In Changes (ex. berries growing )
