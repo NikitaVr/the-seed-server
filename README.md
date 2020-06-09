@@ -14,10 +14,24 @@ Should start to see server running, and processing empty actions
 
 Can test out connecting a player and rendering by running code in the sample renderer repo : https://github.com/NikitaVr/the-seed-render 
 
+## Initialize State
+
 ## Core Loop
 
-
-
+1. Agents Connect ( this can really be done at any point )
+1. Server sends State
+1. Agent
+    1. Calculate Reward
+    1. Calculate new Action
+    1. Send new Action to Server
+1. Server
+    1. Receives Actions
+    1. Identify Conflicts
+    1. Resolve Conflicts
+    1. Take Actions -> New State
+    1. Apply Environment Built In Changes (ex. berries growing )
+    1. Send new State
+1. Repeat
 
 ## When to Step
 
