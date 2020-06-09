@@ -29,7 +29,7 @@ Can test out connecting a player and rendering by running code in the sample ren
     1. Identify Conflicts ( ex. 2 agents trying to eat the same food )
     1. Resolve Conflicts
     1. Take Actions -> New State
-    1. Apply Environment Built In Changes (ex. berries growing )
+    1. Apply Environment Built In Changes ( ex. berries growing )
     1. Send new State
 1. Repeat
 
