@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "my first socket.io app",
   "scripts": {
-    "start": "node ./dist/index.js"
+    "start": "tsc && node ./dist/index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
